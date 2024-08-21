@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="mt-4">
+        <h1>
+            {{form.vars.data.id is null ? 'Create Post' : 'Update Post'}}
+        </h1>
+        {{form_start(form)}}
+            <div class="form-group">
+                {{form_label(form.title)}} 
+                {{form_widget(form.title, {'attr':{'class':'form-control'}}) }} 
+            </div>
+            <div class="form-group">
+                {{form_label(form.content)}}
+                {{form_widget(form.content,{'attr':{'class':'form-control'}}) }} 
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">
+                {{form.vars.data.id is null ? 'Create' : "Update"}}
+            </button>
+        {{form_end(form)}}
+    </div>
+{% endblock body %}

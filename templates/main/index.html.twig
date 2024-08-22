@@ -4,38 +4,46 @@
 
 {% block body %}
 {% for message in app.flashes('message') %}
-    <div class="alert alert-success">
+    <div class="alert alert-success my-4">
         {{message}}
     </div>
 {% endfor %}
-    <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Title</th>
-            <th scope="col">Content</th>
-            <th scope="col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
+    {{ dump(posts) }}
+    <div class="row row-cols-1 gy-4">
+        {% if posts|length == 0 %}
+            <p>No posts available.</p>
+        {% else %}
             {% for post in posts %}
-                <tr>
-                    <th scope="row">{{post.id}}</th>
-                    <td>{{post.title}}</td>
-                    <td>{{post.content}}</td>
-                    <td>
-                        <a href="{{path('edit_post',{id : post.id}) }}" class="btn btn-success">Edit</a>
-                        <a href="{{path('delete_post',{id : post.id}) }}" class="btn btn-danger">Delete</a>
-                    </td>
-                </tr>
+                <div class="col">
+                    <div class="card h-100 shadow-sm d-flex flex-column">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex">
+                                <div class="flex-grow-1">
+                                    <h5 class="card-title">{{ post.title }}</h5>
+                                    <p class="card-text text-muted">{{ post.User.email }}</p>
+                                </div>
+                                {% if post.file %}
+                                    <img src="{{ asset('upload/posts/' ~ post.File) }}" alt="{{ post.title }}" class="img-fluid rounded" style="max-width: 150px; max-height: 150px;">
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex justify-content-end">
+                            <a href="{{path('detail_post', {'id': post.id})}}" class="btn btn-success btn-sm me-2"> 
+                                Show more
+                            </a>
+                            {# <a href="{{ path('edit_post', {id : post.id}) }}" class="btn btn-success btn-sm me-2">Edit</a>
+                            <a href="{{ path('delete_post', {id : post.id}) }}" class="btn btn-danger btn-sm">Delete</a> #}
+                        </div>
+                    </div>
+                </div>
             {% endfor %}
-        </tbody>
-    </table>
-    <div class="d-grid gap-2">
-        <a href="{{path('create_post')}}" class="btn btn-primary">
+        {% endif %}
+        
+    </div>
+
+    <div class="d-grid gap-2 mt-4">
+        <a href="{{ path('create_post') }}" class="btn btn-primary">
             Add Post
         </a>
     </div>
-
-
 {% endblock %}

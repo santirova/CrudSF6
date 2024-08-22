@@ -40,4 +40,15 @@ class PostRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function findAllPosts(){
+        return $this->getEntityManager()
+            ->createQuery('
+                SELECT post.id, post.title, post.description, post.file, post.creation_date, post.url, user.email
+                FROM App\Entity\Post post
+                JOIN post.user user
+                ORDER BY post.id DESC
+            ');
+            
+    }
 }

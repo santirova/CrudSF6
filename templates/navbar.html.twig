@@ -1,0 +1,29 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="{{ path('app_main') }}">
+            SF6
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                    <li class="nav-item active">
+                        <a class="nav-link text" href="{{ path('app_logout') }}">Logout <i class="bi bi-box-arrow-right"></i></a>
+                    </li>
+                    {# <li class="nav-item active">
+                        <a class="nav-link" href="{{ path('app_logout') }}">Logout <i class="bi bi-box-arrow-right"></i></a>
+                    </li> #}
+                {% else %}
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{{ path('app_register') }}">Register <i class="bi bi-person-plus"></i></a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{{ path('app_login') }}">Login <i class="bi bi-box-arrow-in-right"></i></a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

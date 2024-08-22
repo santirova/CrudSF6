@@ -19,6 +19,9 @@ class Post
     #[ORM\Column(length: 255)]
     private ?string $content = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $File = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -44,6 +47,18 @@ class Post
     public function setContent(string $content): static
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function getFile(): ?string
+    {
+        return $this->File;
+    }
+
+    public function setFile(?string $File): static
+    {
+        $this->File = $File;
 
         return $this;
     }

@@ -3,11 +3,27 @@
 {% block title %}Posts List{% endblock %}
 
 {% block body %}
-{% for message in app.flashes('message') %}
-    <div class="alert alert-success my-4">
-        {{message}}
+
+    {{ form_start(filterForm) }}
+    {{ form_row(filterForm.startDate) }}
+    {{ form_row(filterForm.endDate) }}
+    <div class="d-flex justify-content-between">
+        <button class="btn btn-primary" type="submit">Apply Filters</button>
+        {% if filtersApplied %}
+        <a href="{{ path('app_main') }}" class="btn btn-secondary">Clear Filters</a>
+        {% endif %}
     </div>
-{% endfor %}
+    {{ form_end(filterForm) }}
+
+    {% if filtersApplied %}
+        <div class="alert alert-info mt-4">
+            Results for date range: 
+            {% if startDate %}{{ startDate|date('Y-m-d') }}{% else %}{{ 'N/A' }}{% endif %} 
+            to 
+            {% if endDate %}{{ endDate|date('Y-m-d') }}{% else %}{{ 'N/A' }}{% endif %}
+        </div>
+    {% endif %}
+
     <div class="row row-cols-1 gy-4">
         {% if posts|length == 0 %}
             <p>No posts available.</p>
@@ -31,14 +47,11 @@
                             <a href="{{path('detail_post', {'id': post.id})}}" class="btn btn-success btn-sm me-2"> 
                                 Show more
                             </a>
-                            {# <a href="{{ path('edit_post', {id : post.id}) }}" class="btn btn-success btn-sm me-2">Edit</a>
-                            <a href="{{ path('delete_post', {id : post.id}) }}" class="btn btn-danger btn-sm">Delete</a> #}
                         </div>
                     </div>
                 </div>
             {% endfor %}
         {% endif %}
-        
     </div>
 
     <div class="d-grid gap-2 mt-4">

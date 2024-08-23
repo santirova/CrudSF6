@@ -47,6 +47,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'User', orphanRemoval: true)]
     private Collection $comments;
 
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $lastname = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $phone = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $instagram = null;
+
     public function __construct()
     {
         $this->posts = new ArrayCollection();
@@ -184,6 +196,54 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $comment->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getLastname(): ?string
+    {
+        return $this->lastname;
+    }
+
+    public function setLastname(string $lastname): static
+    {
+        $this->lastname = $lastname;
+
+        return $this;
+    }
+
+    public function getPhone(): ?int
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?int $phone): static
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getInstagram(): ?string
+    {
+        return $this->instagram;
+    }
+
+    public function setInstagram(?string $instagram): static
+    {
+        $this->instagram = $instagram;
 
         return $this;
     }

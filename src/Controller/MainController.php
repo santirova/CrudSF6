@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Comment;
 use App\Entity\Post;
 use App\Form\CommentType;
+use App\Form\FilterPostsType;
 use App\Form\PostType;
 use App\Repository\PostRepository;
 use App\Service\FileUploader;
@@ -29,14 +30,45 @@ class MainController extends AbstractController
     }
 
     #[Route('/main', name: 'app_main')]
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $posts = $this->em->getRepository(Post::class)->findAll();
+        $filterForm = $this->createForm(FilterPostsType::class);
+        $filterForm->handleRequest($request);
+    
+        $queryBuilder = $this->em->getRepository(Post::class)->createQueryBuilder('p');
+        $filtersApplied = false;
+        $startDate = null;
+        $endDate = null;
+    
+        if ($filterForm->isSubmitted() && $filterForm->isValid()) {
+            $startDate = $filterForm->get('startDate')->getData();
+            $endDate = $filterForm->get('endDate')->getData();
+    
+            if ($startDate) {
+                $queryBuilder->andWhere('p.creation_date >= :startDate')
+                             ->setParameter('startDate', $startDate);
+                $filtersApplied = true;
+            }
+    
+            if ($endDate) {
+                $queryBuilder->andWhere('p.creation_date <= :endDate')
+                             ->setParameter('endDate', $endDate);
+                $filtersApplied = true;
+            }
+        }
+    
+        $posts = $queryBuilder->getQuery()->getResult();
+    
         return $this->render('main/index.html.twig', [
-            'controller_name' => 'MainController',
-            'posts' => $posts
+            'posts' => $posts,
+            'filterForm' => $filterForm->createView(),
+            'filtersApplied' => $filtersApplied,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
         ]);
     }
+    
+    
 
     #[Route('/create_post', name: 'create_post')]
     public function createPost(Request $request, FileUploader $fileUploader){

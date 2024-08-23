@@ -14,7 +14,11 @@
         {% endblock %}
     </head>
     <body>
-        {% include "navbar.html.twig" %}
+        {% if show_navbar is not defined or show_navbar %}
+        {% block navbar %}
+            {{ include('navbar.html.twig') }}
+        {% endblock %}
+        {% endif %}
         <div class="container">
             {% block body %}{% endblock %}
         </div>

@@ -3,9 +3,9 @@
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block body %}
-{{ dump(app) }}
-<div class="container my-5">
-    <div class="card mb-3">
+<div class="container p-0">
+    <a href="{{ path('app_main') }}"><i class="bi bi-arrow-left-circle primary" style="font-size: 2rem;"></i></a>
+    <div class="card mt-1 mb-3">
         <div class="row g-0">
             <div class="col-md-8">
                 <div class="card-body">
@@ -28,9 +28,12 @@
     {% if post.comments is not empty %}
         <ul class="list-group mb-4">
             {% for comment in post.comments %}
-                <li class="list-group-item">
-                    <strong>{{ comment.User.email }}</strong> on {{ comment.creationDate|date('Y-m-d H:i') }}
-                    <p>{{ comment.text }}</p>
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong><i class="bi bi-person-circle"></i> {{ comment.User.email }}</strong>
+                        <p>{{ comment.text }}</p>
+                    </div>
+                    <span class="text-muted">{{ comment.creationDate|date('Y-m-d H:i') }}</span>
                 </li>
             {% endfor %}
         </ul>

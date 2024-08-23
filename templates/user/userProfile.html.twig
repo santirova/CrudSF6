@@ -1,0 +1,8 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile{% endblock %}
+{% block body %}
+{{ dump(user) }}
+<a href="{{path('app_main')}}" class="btn btn-primary"> go back</a>
+
+{% endblock %}

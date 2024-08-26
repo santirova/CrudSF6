@@ -7,16 +7,17 @@ use App\Entity\Post;
 use App\Form\CommentType;
 use App\Form\FilterPostsType;
 use App\Form\PostType;
-use App\Repository\PostRepository;
 use App\Service\FileUploader;
 use DateTime;
 use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class MainController extends AbstractController
 {
@@ -29,53 +30,86 @@ class MainController extends AbstractController
         $this->em = $em;
     }
 
+
     #[Route('/main', name: 'app_main')]
-    public function index(Request $request): Response
+    public function index(Request $request, PaginatorInterface $paginator, SessionInterface $session): Response
     {
         $filterForm = $this->createForm(FilterPostsType::class);
         $filterForm->handleRequest($request);
-    
+
         $queryBuilder = $this->em->getRepository(Post::class)->createQueryBuilder('p');
         $filtersApplied = false;
-        $startDate = null;
-        $endDate = null;
-        $type = null;
-    
+
+        // Cargar los filtros de la sesión
+        $startDate = $session->get('startDate');
+        $endDate = $session->get('endDate');
+        $type = $session->get('type');
+
         if ($filterForm->isSubmitted() && $filterForm->isValid()) {
             $startDate = $filterForm->get('startDate')->getData();
             $endDate = $filterForm->get('endDate')->getData();
             $type = $filterForm->get('type')->getData();
-    
-            if ($startDate) {
-                $queryBuilder->andWhere('p.creation_date >= :startDate')
-                             ->setParameter('startDate', $startDate);
-                $filtersApplied = true;
-            }
-    
-            if ($endDate) {
-                $queryBuilder->andWhere('p.creation_date <= :endDate')
-                             ->setParameter('endDate', $endDate);
-                $filtersApplied = true;
-            }
 
-            if ($type) {
-                $queryBuilder->andWhere('p.type = :type')
-                             ->setParameter('type', $type);
-                $filtersApplied = true;
-            }
+            // Guardar los filtros en la sesión
+            $session->set('startDate', $startDate);
+            $session->set('endDate', $endDate);
+            $session->set('type', $type);
+
+            $filtersApplied = true;
+
+            // Reiniciar la paginación a la página 1 cuando se aplican filtros
+            return $this->redirectToRoute('app_main', ['page' => 1]);
+        } elseif ($startDate || $endDate || $type) {
+            $filtersApplied = true;
         }
+
+        // Aplicar los filtros a la consulta
+        if ($startDate) {
+            $queryBuilder->andWhere('p.creation_date >= :startDate')
+                        ->setParameter('startDate', $startDate);
+        }
+
+        if ($endDate) {
+            $queryBuilder->andWhere('p.creation_date <= :endDate')
+                        ->setParameter('endDate', $endDate);
+        }
+
+        if ($type) {
+            $queryBuilder->andWhere('p.type = :type')
+                        ->setParameter('type', $type);
+        }
+
         $queryBuilder->orderBy('p.creation_date', 'DESC');
-        $posts = $queryBuilder->getQuery()->getResult();
-    
+
+        $pagination = $paginator->paginate(
+            $queryBuilder, // query o queryBuilder
+            $request->query->getInt('page', 1), // número de página actual
+            2 // límite por página
+        );
+
         return $this->render('main/index.html.twig', [
-            'posts' => $posts,
             'filterForm' => $filterForm->createView(),
             'filtersApplied' => $filtersApplied,
             'startDate' => $startDate,
             'endDate' => $endDate,
-            'type' => $type
+            'type' => $type,
+            'pagination' => $pagination,
         ]);
     }
+
+    #[Route('/main/clear-filters', name: 'app_main_clear_filters')]
+    public function clearFilters(SessionInterface $session): RedirectResponse
+    {
+        // Limpiar los filtros de la sesión
+        $session->remove('startDate');
+        $session->remove('endDate');
+        $session->remove('type');
+
+        // Redirigir a la página principal sin filtros
+        return $this->redirectToRoute('app_main');
+    }
+
+
     
     
 

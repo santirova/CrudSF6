@@ -23,8 +23,12 @@ class RegistrationFormType extends AbstractType
             ->add('email', EmailType::class)
             ->add('name',TextType::class)
             ->add('lastname',TextType::class)
-            ->add('phone',NumberType::class)
-            ->add('instagram',TextType::class)
+            ->add('phone',NumberType::class,[
+                'required'=>false
+            ])
+            ->add('instagram',TextType::class,[
+                'required'=>false
+            ])
             ->add('plainPassword', PasswordType::class, [
                 // instead of being set onto the object directly,
                 // this is read and encoded in the controller

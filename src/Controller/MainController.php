@@ -39,10 +39,12 @@ class MainController extends AbstractController
         $filtersApplied = false;
         $startDate = null;
         $endDate = null;
+        $type = null;
     
         if ($filterForm->isSubmitted() && $filterForm->isValid()) {
             $startDate = $filterForm->get('startDate')->getData();
             $endDate = $filterForm->get('endDate')->getData();
+            $type = $filterForm->get('type')->getData();
     
             if ($startDate) {
                 $queryBuilder->andWhere('p.creation_date >= :startDate')
@@ -55,8 +57,14 @@ class MainController extends AbstractController
                              ->setParameter('endDate', $endDate);
                 $filtersApplied = true;
             }
+
+            if ($type) {
+                $queryBuilder->andWhere('p.type = :type')
+                             ->setParameter('type', $type);
+                $filtersApplied = true;
+            }
         }
-    
+        $queryBuilder->orderBy('p.creation_date', 'DESC');
         $posts = $queryBuilder->getQuery()->getResult();
     
         return $this->render('main/index.html.twig', [
@@ -65,6 +73,7 @@ class MainController extends AbstractController
             'filtersApplied' => $filtersApplied,
             'startDate' => $startDate,
             'endDate' => $endDate,
+            'type' => $type
         ]);
     }
     

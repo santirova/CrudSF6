@@ -11,6 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 class Post
 {
+    const TYPES =  ["Programacion" => "Programacion", "Humor" => "Humor", "Deportes" => "Deportes", "Cine" => "Cine", "Politica" => "Politica", "Otro" => "Otro"];
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -37,6 +39,9 @@ class Post
      */
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'Post')]
     private Collection $comments;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $type = null;
 
     public function __construct()
     {
@@ -134,6 +139,18 @@ class Post
                 $comment->setPost(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(?string $type): static
+    {
+        $this->type = $type;
 
         return $this;
     }

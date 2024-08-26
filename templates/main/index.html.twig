@@ -7,6 +7,7 @@
     {{ form_start(filterForm) }}
     {{ form_row(filterForm.startDate) }}
     {{ form_row(filterForm.endDate) }}
+    {{ form_row(filterForm.type) }}
     <div class="d-flex justify-content-between">
         <button class="btn btn-primary" type="submit">Apply Filters</button>
         {% if filtersApplied %}
@@ -21,6 +22,8 @@
             {% if startDate %}{{ startDate|date('Y-m-d') }}{% else %}{{ 'N/A' }}{% endif %} 
             to 
             {% if endDate %}{{ endDate|date('Y-m-d') }}{% else %}{{ 'N/A' }}{% endif %}
+            and type: 
+            {% if type %}{{ type }}{% else %}{{ 'All' }}{% endif %}
         </div>
     {% endif %}
 
@@ -43,8 +46,9 @@
                                 {% endif %}
                             </div>
                         </div>
-                        <div class="card-footer d-flex justify-content-end">
-                            <a href="{{path('detail_post', {'id': post.id})}}" class="btn btn-success btn-sm me-2"> 
+                        <div class="card-footer d-flex justify-content-between">
+                            <p class="text-muted">{{ post.creationDate|date('Y-m-d H:i') }}</p>
+                            <a href="{{path('detail_post', {'id': post.id})}}" class="btn btn-success "> 
                                 Show more
                             </a>
                         </div>

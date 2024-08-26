@@ -2,7 +2,9 @@
 
 namespace App\Form;
 
+use App\Entity\Post;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -23,7 +25,14 @@ class FilterPostsType extends AbstractType
                 'label' => 'End Date',
                 'required' => false,
                 'attr' => ['class' => 'form-control'],
+            ])
+            ->add('type', ChoiceType::class, [
+                'choices' => array_merge(["Todos"=> ''], Post::TYPES),
+                'required' => false,
+                'placeholder' => 'All Types',
+                'attr' => ['class' => 'form-control'],
             ]);
+        
         
     }
 

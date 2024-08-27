@@ -50,6 +50,22 @@
                         <div class="card-footer d-flex justify-content-between">
                             <p class="text-muted">{{ post.creationDate|date('Y-m-d H:i') }}</p>
                             <a href="{{ path('detail_post', {'id': post.id}) }}" class="btn btn-success">Show more</a>
+
+                            <!-- Like/Unlike Button -->
+                            {% if app.user %}
+                                <button class="btn btn-primary like-button" data-post-id="{{ post.id }}">
+                                    {% if app.user in post.likes|map(like => like.user) %}
+                                        Unlike
+                                    {% else %}
+                                        Like
+                                    {% endif %}
+                                </button>
+                            {% else %}
+                                <button class="btn btn-primary" disabled>
+                                    Login to like
+                                </button>
+                            {% endif %}
+                            <span id="like-count-{{ post.id }}">{{ post.likes|length }} likes</span>
                         </div>
                     </div>
                 </div>
@@ -69,4 +85,43 @@
             </button>
         {% endif %}
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $('.like-button').on('click', function(e) {
+            e.preventDefault();
+            
+            const button = $(this);
+            const postId = button.data('post-id');
+            console.log(postId)
+            
+            $.ajax({
+                url: `http://localhost/CrudSymfony6/public/index.php/post/${postId}/like`,
+                method: 'POST',
+                success: function(response) {
+                    if (response.status === 'liked') {
+                        button.text('Unlike');
+                    } else {
+                        button.text('Like');
+                    }
+                    
+                    $(`#like-count-${postId}`).text(response.likeCount + ' likes');
+                },
+                error: function(xhr) {
+                    console.log('Status:', xhr.status);
+                    console.log('Status Text:', xhr.statusText);
+                    console.log('Response Text:', xhr.responseText);
+                    if (xhr.status === 401) {
+                        alert('You need to be logged in to like posts.');
+                    } else {
+                        console.log(xhr)
+                        alert('An error occurred.');
+                    }
+                }
+            });
+        });
+    });
+    </script>
+
 {% endblock %}

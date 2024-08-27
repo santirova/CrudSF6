@@ -8,7 +8,7 @@
     {{ form_row(filterForm.startDate) }}
     {{ form_row(filterForm.endDate) }}
     {{ form_row(filterForm.type) }}
-    <div class="d-flex justify-content-between">
+    <div class="d-flex justify-content-between mb-4">
         <button class="btn btn-primary" type="submit">Apply Filters</button>
         {% if filtersApplied %}
             <a href="{{ path('app_main_clear_filters') }}" class="btn btn-secondary">Clear Filters</a>
@@ -28,44 +28,42 @@
         </div>
     {% endif %}
 
-    <div class="row row-cols-1 gy-4">
+    <div class="row gy-4">
         {% if pagination|length == 0 %}
-            <p>No posts available.</p>
+            <p class="text-center col-12">No posts available.</p>
         {% else %}
-            <h1>Posts</h1>
+            <h1 class="text-center mb-4">Posts</h1>
             {% for post in pagination %}
-                <div class="col mb-2">
-                    <div class="card h-100 shadow-sm d-flex flex-column">
+                <div class="col-12">
+                    <div class="card h-100 shadow border-light rounded-3">
+                        {% if post.file %}
+                            <img src="{{ asset('upload/posts/' ~ post.File) }}" alt="{{ post.title }}" class="card-img-top img-fluid rounded-top" style="max-height: 300px; object-fit: cover;">
+                        {% endif %}
                         <div class="card-body d-flex flex-column">
-                            <div class="d-flex">
-                                <div class="flex-grow-1">
-                                    <h5 class="card-title">{{ post.title }}</h5>
-                                    <p class="card-text text-muted">{{ post.User.email }}</p>
-                                </div>
-                                {% if post.file %}
-                                    <img src="{{ asset('upload/posts/' ~ post.File) }}" alt="{{ post.title }}" class="img-fluid rounded" style="max-width: 150px; max-height: 150px;">
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="card-footer d-flex justify-content-between">
+                            <h5 class="card-title">{{ post.title }}</h5>
+                            <p class="card-text text-muted">{{ post.User.email }}</p>
                             <p class="text-muted">{{ post.creationDate|date('Y-m-d H:i') }}</p>
-                            <a href="{{ path('detail_post', {'id': post.id}) }}" class="btn btn-success">Show more</a>
-
-                            <!-- Like/Unlike Button -->
-                            {% if app.user %}
-                                <button class="btn btn-primary like-button" data-post-id="{{ post.id }}">
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                {% if app.user %}
+                                <button class="like-button" style="border: none; background: none;" data-post-id="{{ post.id }}">
                                     {% if app.user in post.likes|map(like => like.user) %}
-                                        Unlike
+                                    <i class="bi bi-heart-fill" style="color: red; font-size: 1.5rem;"></i>
                                     {% else %}
-                                        Like
+                                    <i class="bi bi-heart" style="color: red; font-size: 1.5rem;"></i>
                                     {% endif %}
                                 </button>
-                            {% else %}
+                                <span id="like-count-{{ post.id }}" class="ms-2">{{ post.likes|length }}</span>    
+                                {% else %}
                                 <button class="btn btn-primary" disabled>
                                     Login to like
                                 </button>
-                            {% endif %}
-                            <span id="like-count-{{ post.id }}">{{ post.likes|length }} likes</span>
+                                {% endif %}
+                            </div>
+                            <a href="{{ path('detail_post', {'id': post.id}) }}" class="btn btn-success">
+                                Show more
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -85,43 +83,5 @@
             </button>
         {% endif %}
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-    $(document).ready(function() {
-        $('.like-button').on('click', function(e) {
-            e.preventDefault();
-            
-            const button = $(this);
-            const postId = button.data('post-id');
-            console.log(postId)
-            
-            $.ajax({
-                url: `http://localhost/CrudSymfony6/public/index.php/post/${postId}/like`,
-                method: 'POST',
-                success: function(response) {
-                    if (response.status === 'liked') {
-                        button.text('Unlike');
-                    } else {
-                        button.text('Like');
-                    }
-                    
-                    $(`#like-count-${postId}`).text(response.likeCount + ' likes');
-                },
-                error: function(xhr) {
-                    console.log('Status:', xhr.status);
-                    console.log('Status Text:', xhr.statusText);
-                    console.log('Response Text:', xhr.responseText);
-                    if (xhr.status === 401) {
-                        alert('You need to be logged in to like posts.');
-                    } else {
-                        console.log(xhr)
-                        alert('An error occurred.');
-                    }
-                }
-            });
-        });
-    });
-    </script>
 
 {% endblock %}

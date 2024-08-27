@@ -22,7 +22,7 @@ class LikeController extends AbstractController
     {
         $user = $this->getUser();
         $date = new DateTimeImmutable();
-        $date->setTimezone(new DateTimeZone('America/Argentina/Buenos_Aires'));
+        $newDate = $date->setTimezone(new DateTimeZone('America/Argentina/Buenos_Aires'));
         if (!$user) {
             return new JsonResponse(['error' => 'User not authenticated'], JsonResponse::HTTP_UNAUTHORIZED);
         }
@@ -37,7 +37,7 @@ class LikeController extends AbstractController
             $like = new Like();
             $like->setPost($post);
             $like->setUser($user);
-            $like->setLikedAt($date);
+            $like->setLikedAt($newDate);
 
             $em->persist($like);
             $this->addFlash('success', 'You liked the post.');

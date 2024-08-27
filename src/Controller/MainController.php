@@ -84,7 +84,7 @@ class MainController extends AbstractController
         $pagination = $paginator->paginate(
             $queryBuilder, // query o queryBuilder
             $request->query->getInt('page', 1), // número de página actual
-            2 // límite por página
+            5 // límite por página
         );
 
         return $this->render('main/index.html.twig', [

@@ -2,20 +2,39 @@
 
 namespace App\Controller;
 
+use App\Form\UserProfileType;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class UserController extends AbstractController
 {
+    private $em;
+    public function __construct(EntityManagerInterface $em)
+    {
+        $this->em = $em;
+    }
+
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[Route('/profile', name: 'app_profile')]
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $user = $this->getUser();
+        $form = $this->createForm(UserProfileType::class,$user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid() ) {
+            $this->em->flush();
+
+            return $this->redirectToRoute('app_profile');
+
+        }
         return $this->render('user/userProfile.html.twig', [
             'user' => $user,
+            'form' => $form->createView()
         ]);
     }
     #[IsGranted('IS_AUTHENTICATED_FULLY')]

@@ -40,11 +40,16 @@
                 </div>
                 <div class="modal-body">
                     <!-- Future form for editing profile will go here -->
-                    <p>Edit profile form coming soon!</p>
+                    {{ form_start(form) }}
+                    {{ form_row(form.name) }}
+                    {{ form_row(form.lastname) }}
+                    {{ form_row(form.phone) }}
+                    {{ form_row(form.instagram) }}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    {{ form_end(form) }}
                 </div>
             </div>
         </div>

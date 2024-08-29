@@ -43,15 +43,22 @@ class UserController extends AbstractController
     {
         $user = $this->getUser(); // Obtiene el usuario actualmente autenticado
 
-    if (!$user) {
-        throw $this->createNotFoundException('User not found');
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+
+        $userPosts = $user->getPosts(); // Obtiene los posts relacionados con el usuario
+            return $this->render('user/userPosts.html.twig', [
+                'posts' => $userPosts,
+                'user' => $user,
+
+            ]);
     }
 
-    $userPosts = $user->getPosts(); // Obtiene los posts relacionados con el usuario
-        return $this->render('user/userPosts.html.twig', [
-            'posts' => $userPosts,
-            'user' => $user,
-
-        ]);
-    }
+    // #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    // #[Route('/edit-post/{id}', name: 'edit_post')]
+    // public function editPost($id): Response
+    // {
+    //     $user = $this->getUser();
+    // }
 }

@@ -23,7 +23,7 @@ class MainController extends AbstractController
 {
     private $em;
     private $date;
-    
+
     public function __construct(EntityManagerInterface $em)
     {
         $this->date = new DateTime();
@@ -142,17 +142,35 @@ class MainController extends AbstractController
     }
 
     #[Route('/edit_post/{id}', name: 'edit_post')]
-    public function editPost(Request $request, $id)
+    public function editPost(Request $request, $id, FileUploader $fileUploader)
     {
+        $user = $this->getUser();
         $post = $this->em->getRepository(Post::class)->find($id);
+
+        if ($post->getUser() !== $user) {
+            throw $this->createAccessDeniedException('You do not have permission to edit this post.');
+        }
+
         $form = $this->createForm(PostType::class,$post);
         $form->handleRequest($request);
+        $image = $form->get('File')->getData();
+        $oldImage = $post->getFile();
 
         if ($form->isSubmitted() && $form ->isValid()) {
+
+            if ($image) {
+                $imageName = $fileUploader->upload($image);
+                $post->setFile($imageName);
+
+                if ($oldImage) {
+                    $fileUploader->remove($oldImage);
+                }
+            }
+
             $this->em->persist($post);
             $this->em->flush();
             $this->addFlash('message','Updated Successfully');
-            return $this->redirectToRoute('app_main');
+            return $this->redirectToRoute('user_posts');
         }
 
         return $this->render('main/post.html.twig',[
